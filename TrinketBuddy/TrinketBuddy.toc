@@ -1,0 +1,12 @@
+## Interface: 30300
+## Title: |cff33ccffTrinket|r|cffffcc00Buddy|r
+## Version: 1.1.2
+## Author: feralpaw
+## Notes: Proc and cooldown icons for trinkets, rings and enchants. Movable, snapping, with an optional group frame.
+## SavedVariables: TrinketBuddyDB
+## SavedVariablesPerCharacter: TrinketBuddyChar
+## OptionalDeps: OmniCC, LibSharedMedia-3.0, SharedMedia
+
+Data.lua
+Core.lua
+Options.lua
