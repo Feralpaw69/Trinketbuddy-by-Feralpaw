@@ -288,7 +288,14 @@ local function GeneralPage()
     Check(vis, "Show the proc's spell icon while active", function() return cfg.procIcon end,
         function(v) cfg.procIcon = v Redraw() end)
     Check(vis, "Border around each icon", function() return cfg.iconBorder end,
-        function(v) cfg.iconBorder = v Redraw() end, "Thin black frame around every single icon.\nThe thickness is set per icon on the Icons page.")
+        function(v) cfg.iconBorder = v Redraw() end, "Frame around every single icon.\nThe thickness is set per icon on the Icons page.")
+    Color(vis, "Border color", function() return cfg.borderColor end, function(r, g, b)
+        cfg.borderColor[1], cfg.borderColor[2], cfg.borderColor[3] = r, g, b
+        Redraw()
+    end, 26)
+    Check(vis, "Borderless icons (hide the icon art's own edge)", function() return cfg.cropEdges end,
+        function(v) cfg.cropEdges = v Redraw() end,
+        "Cuts off the bevelled edge that is part of every Blizzard icon picture.\nTogether with \"Border around each icon\" off, icons have no frame at all.")
     Check(vis, "Stack count at the bottom", function() return cfg.stacksBottom end, function(v) cfg.stacksBottom = v Redraw() end)
     Check(vis, "Tenths of a second below 10s", function() return cfg.decimals end, function(v) cfg.decimals = v end)
 

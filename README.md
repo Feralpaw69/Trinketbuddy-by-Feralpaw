@@ -2,7 +2,7 @@
 
 ![TrinketBuddy in-game](images/trinketbuddy-example.png)
 
-> World of Warcraft **3.3.5a (WotLK)** addon · made by **feralpaw** · version **1.1.2**
+> World of Warcraft **3.3.5a (WotLK)** addon · made by **feralpaw** · version **1.1.3**
 
 **Fast jump:** [Features](#features) | [Install](#install) | [Moving icons](#moving-icons) | [Glow](#glow) | [Group frame](#group-frame) | [Profiles](#profiles) | [Mouse controls](#mouse-controls) | [Commands](#commands) | [Options](#options) | [Changelog](#changelog)
 
@@ -105,7 +105,9 @@ An optional box behind all your icons — **off by default**.
 - Follows the icons when you move them
 - Padding, border thickness, border colour, background colour and opacity
 
-Each icon also has its own thin border (**Border around each icon**, on by default; thickness per icon).
+Icon look:
+- **Border around each icon** — on by default; colour free to choose (default black), thickness per icon
+- **Borderless icons** — cuts off the edge that is part of every icon picture (on by default); with the border off, icons have no frame at all
 
 ---
 
@@ -173,7 +175,7 @@ Out of combat, hold the modifier and click an icon:
 
 Esc → Interface → AddOns → **TrinketBuddy** (or `/tb`):
 
-- **TrinketBuddy** — visibility, icon borders, moving & snapping, which icons are tracked, clicking & swap trinket
+- **TrinketBuddy** — visibility, icon borders (colour, borderless), moving & snapping, which icons are tracked, clicking & swap trinket
 - **Icons** — pick an icon: shown, item level, glow, size, X/Y, zoom, border, text sizes; *Apply to all icons*
 - **Look** — proc glow & ready glow (style, colours), font (Blizzard fonts + LibSharedMedia), group frame
 - **Profiles** — save / load / delete, chat commands
@@ -181,6 +183,10 @@ Esc → Interface → AddOns → **TrinketBuddy** (or `/tb`):
 ---
 
 ## Changelog
+
+### 1.1.3 (2026-10-25)
+- New option **Borderless icons** (cuts off the icon art's own edge, default on)
+- Icon border colour can be changed (default black)
 
 ### 1.1.2 (2026-10-25)
 - New option **Border around each icon** (default on)

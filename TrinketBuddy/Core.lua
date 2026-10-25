@@ -36,7 +36,7 @@ local LAYOUT = {
 ns.ORDER, ns.LABEL = {}, {}
 
 local DEFAULTS = {
-    iconBorder = true,
+    iconBorder = true, borderColor = {0, 0, 0}, cropEdges = true,
     combatOnly = false, hideReady = false, procIcon = true, stacksBottom = false, decimals = false,
     clickUse = false, force30 = false, snap = true,
     glow = true, glowStyle = 1, glowColor = {1, 0.82, 0.25},
@@ -355,14 +355,16 @@ end
 function ns.ApplyLayout(icon)
     local s = icon.s
     local size, bd = s.size, cfg.iconBorder and s.border or 0
-    local z = s.zoom / 100
+    -- Blizzard icon art has its own bevelled edge; cropping ~8% hides it (borderless look)
+    local z = (cfg.cropEdges and max(s.zoom, 8) or s.zoom) / 100
     icon.tex:SetTexCoord(z, 1 - z, z, 1 - z)
     icon.tex:ClearAllPoints()
     icon.tex:SetPoint("TOPLEFT", bd, -bd)
     icon.tex:SetPoint("BOTTOMRIGHT", -bd, bd)
     if bd > 0 then
         icon:SetBackdrop({ edgeFile = W8, edgeSize = bd })
-        icon:SetBackdropBorderColor(0, 0, 0, 1)
+        local c = cfg.borderColor
+        icon:SetBackdropBorderColor(c[1], c[2], c[3], 1)
     else
         icon:SetBackdrop(nil)
     end
