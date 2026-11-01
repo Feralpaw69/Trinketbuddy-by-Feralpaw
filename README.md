@@ -2,7 +2,7 @@
 
 ![TrinketBuddy in-game](images/trinketbuddy-example.png)
 
-> World of Warcraft **3.3.5a (WotLK)** addon · made by **feralpaw** · version **1.1.3**
+> World of Warcraft **3.3.5a (WotLK)** addon · made by **feralpaw** · version **1.1.4**
 
 **Fast jump:** [Features](#features) | [Install](#install) | [Moving icons](#moving-icons) | [Glow](#glow) | [Group frame](#group-frame) | [Profiles](#profiles) | [Mouse controls](#mouse-controls) | [Commands](#commands) | [Options](#options) | [Changelog](#changelog)
 
@@ -183,6 +183,10 @@ Esc → Interface → AddOns → **TrinketBuddy** (or `/tb`):
 ---
 
 ## Changelog
+
+### 1.1.4 (2026-11-02)
+- Cooldown timer stays big in the middle, stack count moved to the bottom-left corner (they no longer overlap)
+- Removed the "Stack count at the bottom" option
 
 ### 1.1.3 (2026-10-25)
 - New option **Borderless icons** (cuts off the icon art's own edge, default on)

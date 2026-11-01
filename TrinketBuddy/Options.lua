@@ -296,7 +296,6 @@ local function GeneralPage()
     Check(vis, "Borderless icons (hide the icon art's own edge)", function() return cfg.cropEdges end,
         function(v) cfg.cropEdges = v Redraw() end,
         "Cuts off the bevelled edge that is part of every Blizzard icon picture.\nTogether with \"Border around each icon\" off, icons have no frame at all.")
-    Check(vis, "Stack count at the bottom", function() return cfg.stacksBottom end, function(v) cfg.stacksBottom = v Redraw() end)
     Check(vis, "Tenths of a second below 10s", function() return cfg.decimals end, function(v) cfg.decimals = v end)
 
     local mv = Below(vis, "Moving")

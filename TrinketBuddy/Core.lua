@@ -370,7 +370,7 @@ function ns.ApplyLayout(icon)
     end
 
     icon.stacks:ClearAllPoints()
-    icon.stacks:SetPoint(cfg.stacksBottom and "BOTTOM" or "TOP", 0, cfg.stacksBottom and 2 or -2)
+    icon.stacks:SetPoint("BOTTOMLEFT", 2, 2) -- cooldown in the middle, stacks bottom-left, item level bottom-right
     SetFont(icon.stacks, size, s.stackSize)
     SetFont(icon.ilvl, size, s.ilvlSize)
     SetFont(icon.cdText, size, s.cdSize)
