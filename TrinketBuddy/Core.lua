@@ -36,7 +36,7 @@ local LAYOUT = {
 ns.ORDER, ns.LABEL = {}, {}
 
 local DEFAULTS = {
-    iconBorder = true, borderColor = {0, 0, 0}, cropEdges = true,
+    textLayout = 2, iconBorder = true, borderColor = {0, 0, 0}, cropEdges = true,
     combatOnly = false, hideReady = false, procIcon = true, stacksBottom = false, decimals = false,
     clickUse = false, force30 = false, snap = true,
     glow = true, glowStyle = 1, glowColor = {1, 0.82, 0.25},
@@ -51,7 +51,7 @@ for _, l in ipairs(LAYOUT) do
     ns.LABEL[slot] = l[3]
     DEFAULTS.icons[slot] = {
         show = l[6], x = l[4], y = l[5], size = 32, zoom = 8, border = 1,
-        ilvl = l[2] == "trinket", ilvlSize = 28, stackSize = 45, cdSize = 42, glow = true,
+        ilvl = l[2] == "trinket", ilvlSize = 28, stackSize = 32, cdSize = 50, glow = true,
     }
 end
 ns.DEFAULTS = DEFAULTS
@@ -370,7 +370,7 @@ function ns.ApplyLayout(icon)
     end
 
     icon.stacks:ClearAllPoints()
-    icon.stacks:SetPoint("BOTTOMLEFT", 2, 2) -- cooldown in the middle, stacks bottom-left, item level bottom-right
+    icon.stacks:SetPoint("BOTTOMLEFT", 1, 0) -- cooldown in the middle, stacks bottom-left, item level bottom-right
     SetFont(icon.stacks, size, s.stackSize)
     SetFont(icon.ilvl, size, s.ilvlSize)
     SetFont(icon.cdText, size, s.cdSize)
@@ -979,8 +979,14 @@ function handlers.ADDON_LOADED(name)
     TrinketBuddyDB.profiles = TrinketBuddyDB.profiles or {}
     TrinketBuddyChar = TrinketBuddyChar or {}
     firstRun = not TrinketBuddyChar.cfg
+    local saved = TrinketBuddyChar.cfg
     cfg = copy(DEFAULTS)
-    merge(cfg, TrinketBuddyChar.cfg)
+    merge(cfg, saved)
+    -- 1.1.5: big timer in the middle, small stacks in the corner (once, for older settings)
+    if saved and (saved.textLayout or 1) < 2 then
+        for _, s in pairs(cfg.icons) do s.cdSize, s.stackSize = 50, 32 end
+    end
+    cfg.textLayout = 2
     TrinketBuddyChar.cfg = cfg
     ns.cfg = cfg
     for _, l in ipairs(LAYOUT) do CreateIcon(l[1], l[2], l[3]) end
