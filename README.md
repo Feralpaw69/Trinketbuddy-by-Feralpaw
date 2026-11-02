@@ -2,7 +2,7 @@
 
 ![TrinketBuddy in-game](images/trinketbuddy-example.png)
 
-> World of Warcraft **3.3.5a (WotLK)** addon · made by **feralpaw** · version **1.1.5**
+> World of Warcraft **3.3.5a (WotLK)** addon · made by **feralpaw** · version **1.1.6**
 
 **Fast jump:** [Features](#features) | [Install](#install) | [Moving icons](#moving-icons) | [Glow](#glow) | [Group frame](#group-frame) | [Profiles](#profiles) | [Mouse controls](#mouse-controls) | [Commands](#commands) | [Options](#options) | [Changelog](#changelog)
 
@@ -183,6 +183,9 @@ Esc → Interface → AddOns → **TrinketBuddy** (or `/tb`):
 ---
 
 ## Changelog
+
+### 1.1.6 (2026-11-02)
+- Cooldown timer on all icons set to 40% of the icon size
 
 ### 1.1.5 (2026-11-02)
 - Cooldown timer bigger (50% of the icon), stack count smaller (32%) and further into the bottom-left corner
