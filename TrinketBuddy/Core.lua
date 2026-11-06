@@ -464,7 +464,7 @@ local function CheckAura(icon, force)
         if dur > 0 and (force or exp ~= it.buffEnd) then
             it.buffEnd = exp
             local start = exp - dur
-            if not it.procStart or start > it.procStart then
+            if (not it.procStart or start > it.procStart) and not (it.resetAt and start <= it.resetAt) then
                 it.procStart = start
                 it.cdEnd = it.icd > 0 and start + it.icd or exp
             end
@@ -542,7 +542,7 @@ local function SetItem(icon)
                 return false
             end
             it = { id = id, key = key, tex = tex, ilvl = ilvl, quality = quality,
-                   buff = buff, buffs = multi, stack = buff and D.STACKS[buff], icd = icd }
+                   buff = buff, buffs = multi, stack = buff and D.STACKS[buff], icd = icd, kind = icon.kind }
             if byName then
                 it.byName = true
                 it.buffName = buff and GetSpellInfo(buff)
@@ -1095,7 +1095,7 @@ function handlers.MODIFIER_STATE_CHANGED()
 end
 
 ---------------------------------------------------------------------------
--- Boss kill: this server resets on-use item cooldowns when a boss dies
+-- Boss kill: this server resets trinket cooldowns (on-use and proc) when a boss dies
 ---------------------------------------------------------------------------
 
 local bosses = {} -- GUIDs of bosses seen this zone
@@ -1110,12 +1110,14 @@ end
 function ns.BossKilled()
     if not cfg.bossReset then return end
     local now = GetTime()
+    -- on-use items and proc trinkets (internal cooldown) are reset
+    local function resets(it) return it.usable or (it.kind == "trinket" and it.icd > 0) end
     for _, it in pairs(items) do
-        if it.usable then it.resetAt, it.procStart, it.cdEnd = now, nil, nil end
+        if resets(it) then it.resetAt, it.procStart, it.cdEnd = now, nil, nil end
     end
     for _, icon in pairs(icons) do
         local it = icon.item
-        if it and it.usable and not it.active then
+        if it and resets(it) and not it.active then
             icon.cd:SetCooldown(0, 0)
             Ready(icon)
         end
