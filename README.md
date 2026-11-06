@@ -2,7 +2,7 @@
 
 ![TrinketBuddy in-game](images/trinketbuddy-example.png)
 
-> World of Warcraft **3.3.5a (WotLK)** addon · made by **feralpaw** · version **1.2.1**
+> World of Warcraft **3.3.5a (WotLK)** addon · made by **feralpaw** · version **1.2.2**
 
 **Fast jump:** [Features](#features) | [Install](#install) | [Moving icons](#moving-icons) | [Glow](#glow) | [Group frame](#group-frame) | [Profiles](#profiles) | [Mouse controls](#mouse-controls) | [Commands](#commands) | [Options](#options) | [Changelog](#changelog)
 
@@ -14,7 +14,7 @@
 - Tracks cooldowns on login and after you change gear.
 - Remembers a trinket's cooldown even after you unequip it.
 - Recognises upgraded server versions of items by name (e.g. "Ascended" trinkets with a new item id).
-- Optional: trinket cooldowns (on-use and proc) reset when a boss dies (for servers with that rule).
+- Optional: all cooldowns (trinkets, rings, enchants) reset when a boss dies (for servers with that rule).
 - Built-in cooldown text (or use OmniCC).
 - Light on resources: one event handler and one shared timer for all icons; the timer only runs while something counts down.
 
@@ -185,6 +185,9 @@ Esc → Interface → AddOns → **TrinketBuddy** (or `/tb`):
 ---
 
 ## Changelog
+
+### 1.2.2 (2026-11-07)
+- Boss kill now resets all cooldowns: trinkets, rings and enchants (option "Boss kill resets all cooldowns")
 
 ### 1.2.1 (2026-11-06)
 - Boss kill now also resets the internal cooldown of proc trinkets (option renamed to "Boss kill resets trinket cooldowns")

@@ -322,8 +322,8 @@ local function GeneralPage()
         cfg.clickUse = v
         ns.Print("Click-to-use changes after |cffffff00/reload|r.")
     end, "Needs a /reload. Not available together with \"Hide icons that are ready\".")
-    Check(clk, "Boss kill resets trinket cooldowns", function() return cfg.bossReset end, function(v) cfg.bossReset = v end,
-        "On this server, killing a boss resets trinket cooldowns.\nOn-use cooldowns and proc cooldowns are cleared when a boss dies.\nA proc that is running keeps going; its cooldown is gone afterwards.")
+    Check(clk, "Boss kill resets all cooldowns", function() return cfg.bossReset end, function(v) cfg.bossReset = v end,
+        "On this server, killing a boss resets item cooldowns.\nTrinkets, rings and enchants (on-use and proc cooldowns) are cleared when a boss dies.\nA proc that is running keeps going; its cooldown is gone afterwards.")
     Check(clk, "Swapped trinkets start at 30s cooldown", function() return cfg.force30 end, function(v) cfg.force30 = v end,
         "Equipping a proc trinket normally starts its full internal cooldown.\nCheck this if your server uses 30 seconds instead.")
 

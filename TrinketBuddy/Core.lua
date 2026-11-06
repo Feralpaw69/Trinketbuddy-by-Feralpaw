@@ -1095,7 +1095,7 @@ function handlers.MODIFIER_STATE_CHANGED()
 end
 
 ---------------------------------------------------------------------------
--- Boss kill: this server resets trinket cooldowns (on-use and proc) when a boss dies
+-- Boss kill: this server resets item cooldowns (on-use and proc) when a boss dies
 ---------------------------------------------------------------------------
 
 local bosses = {} -- GUIDs of bosses seen this zone
@@ -1110,8 +1110,8 @@ end
 function ns.BossKilled()
     if not cfg.bossReset then return end
     local now = GetTime()
-    -- on-use items and proc trinkets (internal cooldown) are reset
-    local function resets(it) return it.usable or (it.kind == "trinket" and it.icd > 0) end
+    -- everything is reset: on-use cooldowns and internal cooldowns of trinkets, rings and enchants
+    local function resets(it) return it.usable or it.icd > 0 end
     for _, it in pairs(items) do
         if resets(it) then it.resetAt, it.procStart, it.cdEnd = now, nil, nil end
     end
