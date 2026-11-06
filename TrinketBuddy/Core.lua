@@ -36,7 +36,7 @@ local LAYOUT = {
 ns.ORDER, ns.LABEL = {}, {}
 
 local DEFAULTS = {
-    textLayout = 3, iconBorder = true, borderColor = {0, 0, 0}, cropEdges = true,
+    textLayout = 3, bossReset = true, iconBorder = true, borderColor = {0, 0, 0}, cropEdges = true,
     combatOnly = false, hideReady = false, procIcon = true, stacksBottom = false, decimals = false,
     clickUse = false, force30 = false, snap = true,
     glow = true, glowStyle = 1, glowColor = {1, 0.82, 0.25},
@@ -400,15 +400,16 @@ end
 -- Tracking
 ---------------------------------------------------------------------------
 
-local auraCount, auraDur, auraExp = {}, {}, {}
+local auraCount, auraDur, auraExp, auraByName = {}, {}, {}, {}
 
 local function ScanAuras()
-    wipe(auraCount); wipe(auraDur); wipe(auraExp)
+    wipe(auraCount); wipe(auraDur); wipe(auraExp); wipe(auraByName)
     for i = 1, 40 do
         local name, _, _, count, _, dur, exp, _, _, _, id = UnitBuff("player", i)
         if not name then break end
         if id then
             auraCount[id], auraDur[id], auraExp[id] = count or 0, dur or 0, exp or 0
+            auraByName[name] = id
         end
     end
 end
@@ -418,6 +419,7 @@ local function CheckUse(icon)
     if not (it and it.usable) then return end
     local start, dur = GetInventoryItemCooldown("player", icon.useSlot)
     if not dur or dur <= 2 then return end
+    if it.resetAt and start <= it.resetAt then return end -- cleared by a boss kill
     if it.cdEnd == start + dur and icon.timerEnd then return end -- nothing new
     -- swap trinket (e.g. Gnomish Battle Chicken) used: put the previous trinket back
     if dur > 30 and it.id == ns.SwapID() and icon.prevItem and GetTime() - start < 5 then
@@ -430,12 +432,23 @@ end
 local function CheckAura(icon, force)
     local it = icon.item
     if not (it and (it.buff or it.buffs)) then return end
-    local id = it.buff
-    if not (id and auraExp[id]) then
-        id = nil
-        if it.buffs then
-            for b in pairs(it.buffs) do
-                if auraExp[b] then id = b break end
+    local id
+    if it.byName then
+        -- upgraded server item: its buff may have a new spell id, so match the buff by name
+        id = it.buffName and auraByName[it.buffName]
+        if not id and it.buffNames then
+            for n in pairs(it.buffNames) do
+                if auraByName[n] then id = auraByName[n] break end
+            end
+        end
+    else
+        id = it.buff
+        if not (id and auraExp[id]) then
+            id = nil
+            if it.buffs then
+                for b in pairs(it.buffs) do
+                    if auraExp[b] then id = b break end
+                end
             end
         end
     end
@@ -443,7 +456,9 @@ local function CheckAura(icon, force)
     if id then
         local was = it.active
         local dur, exp = auraDur[id], auraExp[id]
-        local stacks = it.stack and auraCount[it.stack] or auraCount[id]
+        local stackId = it.stack
+        if it.byName and it.stackName then stackId = auraByName[it.stackName] end
+        local stacks = stackId and auraCount[stackId] or auraCount[id]
         icon.stacks:SetText(stacks and stacks > 0 and stacks or "")
         it.active = true
         if dur > 0 and (force or exp ~= it.buffEnd) then
@@ -484,6 +499,8 @@ local function Resolve(icon)
         for slot = 11, 12 do
             local id = GetInventoryItemID("player", slot)
             if id and D.RING[id] then return id, slot, D.RING[id], nil, D.ICD[id] or 60, id end
+            local base = id and D.NAMES[GetItemInfo(id) or ""]
+            if base and D.RING[base] then return id, slot, D.RING[base], nil, D.ICD[base] or 60, id, true end
         end
         return
     end
@@ -492,7 +509,12 @@ local function Resolve(icon)
     if not id then return end
     if icon.kind == "trinket" then
         local buff, multi = D.PROC[id], D.MULTI[id]
-        return id, slot, buff, multi, (buff or multi) and (D.ICD[id] or 45) or 0, id
+        if buff or multi then return id, slot, buff, multi, D.ICD[id] or 45, id end
+        local base = D.NAMES[GetItemInfo(id) or ""]
+        if base and (D.PROC[base] or D.MULTI[base]) then
+            return id, slot, D.PROC[base], D.MULTI[base], D.ICD[base] or 45, id, true
+        end
+        return id, slot, nil, nil, 0, id
     end
     local link = GetInventoryItemLink("player", slot)
     local ench = link and tonumber(link:match("item:%d+:(%d+)"))
@@ -504,7 +526,7 @@ end
 
 -- returns true if the tracked item changed
 local function SetItem(icon)
-    local id, slot, buff, multi, icd, key = Resolve(icon)
+    local id, slot, buff, multi, icd, key, byName = Resolve(icon)
     local old = icon.item
     if old and key == old.key then return false end
     if old and old.id ~= ns.SwapID() then icon.prevItem = old.id end
@@ -521,6 +543,18 @@ local function SetItem(icon)
             end
             it = { id = id, key = key, tex = tex, ilvl = ilvl, quality = quality,
                    buff = buff, buffs = multi, stack = buff and D.STACKS[buff], icd = icd }
+            if byName then
+                it.byName = true
+                it.buffName = buff and GetSpellInfo(buff)
+                it.stackName = it.stack and GetSpellInfo(it.stack)
+                if multi then
+                    it.buffNames = {}
+                    for b in pairs(multi) do
+                        local n = GetSpellInfo(b)
+                        if n then it.buffNames[n] = true end
+                    end
+                end
+            end
             items[key] = it
         end
         local _, _, enable = GetInventoryItemCooldown("player", slot)
@@ -999,6 +1033,7 @@ function handlers.ADDON_LOADED(name)
 end
 
 function handlers.PLAYER_ENTERING_WORLD()
+    handlers.ZONE_CHANGED_NEW_AREA()
     inCombat = UnitAffectingCombat("player") and true or false
     RefreshAll()
     if firstRun then
@@ -1057,6 +1092,61 @@ function handlers.MODIFIER_STATE_CHANGED()
     if moveMode or InCombatLockdown() then return end
     local down = IsModifierKeyDown() and true or false
     for _, icon in pairs(icons) do icon:EnableMouse(down) end
+end
+
+---------------------------------------------------------------------------
+-- Boss kill: this server resets on-use item cooldowns when a boss dies
+---------------------------------------------------------------------------
+
+local bosses = {} -- GUIDs of bosses seen this zone
+
+local function NoteBoss(unit)
+    if UnitExists(unit) and not UnitIsPlayer(unit)
+        and (UnitClassification(unit) == "worldboss" or UnitLevel(unit) == -1) then
+        bosses[UnitGUID(unit)] = true
+    end
+end
+
+function ns.BossKilled()
+    if not cfg.bossReset then return end
+    local now = GetTime()
+    for _, it in pairs(items) do
+        if it.usable then it.resetAt, it.procStart, it.cdEnd = now, nil, nil end
+    end
+    for _, icon in pairs(icons) do
+        local it = icon.item
+        if it and it.usable and not it.active then
+            icon.cd:SetCooldown(0, 0)
+            Ready(icon)
+        end
+    end
+end
+
+function handlers.PLAYER_TARGET_CHANGED() NoteBoss("target") end
+function handlers.PLAYER_FOCUS_CHANGED() NoteBoss("focus") end
+function handlers.UPDATE_MOUSEOVER_UNIT() NoteBoss("mouseover") end
+function handlers.INSTANCE_ENCOUNTER_ENGAGE_UNIT()
+    for i = 1, 4 do NoteBoss("boss" .. i) end
+end
+
+-- the combat log is only watched inside dungeons and raids
+local function CombatLog(_, _, _, event, _, _, _, destGUID) -- frame, "COMBAT_LOG...", timestamp, event, src x3, dest
+    if event == "UNIT_DIED" and bosses[destGUID] then
+        bosses[destGUID] = nil
+        ns.BossKilled()
+    end
+end
+local cl = CreateFrame("Frame")
+cl:SetScript("OnEvent", CombatLog)
+
+function handlers.ZONE_CHANGED_NEW_AREA()
+    wipe(bosses)
+    local _, kind = IsInInstance()
+    if kind == "party" or kind == "raid" then
+        cl:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    else
+        cl:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    end
 end
 
 ev:SetScript("OnEvent", function(_, event, ...) handlers[event](...) end)

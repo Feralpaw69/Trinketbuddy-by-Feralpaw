@@ -2,7 +2,7 @@
 
 ![TrinketBuddy in-game](images/trinketbuddy-example.png)
 
-> World of Warcraft **3.3.5a (WotLK)** addon · made by **feralpaw** · version **1.1.6**
+> World of Warcraft **3.3.5a (WotLK)** addon · made by **feralpaw** · version **1.2.0**
 
 **Fast jump:** [Features](#features) | [Install](#install) | [Moving icons](#moving-icons) | [Glow](#glow) | [Group frame](#group-frame) | [Profiles](#profiles) | [Mouse controls](#mouse-controls) | [Commands](#commands) | [Options](#options) | [Changelog](#changelog)
 
@@ -13,6 +13,8 @@
 - Shows proc duration, stacks and internal cooldown; on-use cooldowns as well.
 - Tracks cooldowns on login and after you change gear.
 - Remembers a trinket's cooldown even after you unequip it.
+- Recognises upgraded server versions of items by name (e.g. "Ascended" trinkets with a new item id).
+- Optional: on-use cooldowns reset when a boss dies (for servers with that rule).
 - Built-in cooldown text (or use OmniCC).
 - Light on resources: one event handler and one shared timer for all icons; the timer only runs while something counts down.
 
@@ -183,6 +185,10 @@ Esc → Interface → AddOns → **TrinketBuddy** (or `/tb`):
 ---
 
 ## Changelog
+
+### 1.2.0 (2026-11-06)
+- Upgraded server versions of items (new item id, same name, e.g. "Ascended" trinkets) are recognised by name; their proc buff is matched by name too
+- On-use item cooldowns reset when a boss dies (option "Boss kill resets on-use cooldowns", default on)
 
 ### 1.1.6 (2026-11-02)
 - Cooldown timer on all icons set to 40% of the icon size
