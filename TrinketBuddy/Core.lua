@@ -1071,6 +1071,7 @@ end
 
 function handlers.PLAYER_REGEN_DISABLED()
     inCombat = true
+    killed, fightStart = false, GetTime()
     -- still allowed to touch secure frames during this event
     if moveMode then
         ns.SetUnlocked(false, true)
@@ -1085,6 +1086,7 @@ end
 
 function handlers.PLAYER_REGEN_ENABLED()
     inCombat = false
+    ns.FightOver()
     for _, icon in pairs(icons) do UpdateButton(icon); UpdateVisibility(icon); UpdateGlow(icon) end
 end
 
@@ -1098,13 +1100,39 @@ end
 -- Boss kill: this server resets item cooldowns (on-use and proc) when a boss dies
 ---------------------------------------------------------------------------
 
-local bosses = {} -- GUIDs of bosses seen this zone
+-- Encounters can have several bosses (Four Horsemen, Blood Prince Council, ...): a boss death
+-- only marks the fight; the reset happens when combat ends and no boss of this fight is alive.
+local bosses = {}      -- GUID -> time a living boss was last seen
+local killed = false   -- a boss died during the current fight
+local fightStart = 0
 
 local function NoteBoss(unit)
-    if UnitExists(unit) and not UnitIsPlayer(unit)
+    if UnitExists(unit) and not UnitIsPlayer(unit) and not UnitIsDead(unit)
         and (UnitClassification(unit) == "worldboss" or UnitLevel(unit) == -1) then
-        bosses[UnitGUID(unit)] = true
+        bosses[UnitGUID(unit)] = GetTime()
     end
+end
+
+-- look at what the group is targeting (once per boss death, so other living bosses are known)
+local function ScanGroupTargets()
+    for i = 1, 4 do NoteBoss("boss" .. i) end
+    NoteBoss("target")
+    NoteBoss("focus")
+    local raid = GetNumRaidMembers()
+    if raid > 0 then
+        for i = 1, raid do NoteBoss("raid" .. i .. "target") end
+    else
+        for i = 1, GetNumPartyMembers() do NoteBoss("party" .. i .. "target") end
+    end
+end
+
+function ns.FightOver()
+    if not killed then return end
+    killed = false
+    for _, seen in pairs(bosses) do
+        if seen >= fightStart - 30 then return end -- a boss of this fight is still alive (wipe)
+    end
+    ns.BossKilled()
 end
 
 function ns.BossKilled()
@@ -1135,7 +1163,9 @@ end
 local function CombatLog(_, _, _, event, _, _, _, destGUID) -- frame, "COMBAT_LOG...", timestamp, event, src x3, dest
     if event == "UNIT_DIED" and bosses[destGUID] then
         bosses[destGUID] = nil
-        ns.BossKilled()
+        killed = true
+        ScanGroupTargets()
+        if not inCombat then ns.FightOver() end -- e.g. you died and the group finished the fight
     end
 end
 local cl = CreateFrame("Frame")

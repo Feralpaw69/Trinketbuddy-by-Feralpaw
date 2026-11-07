@@ -2,7 +2,7 @@
 
 ![TrinketBuddy in-game](images/trinketbuddy-example.png)
 
-> World of Warcraft **3.3.5a (WotLK)** addon · made by **feralpaw** · version **1.2.2**
+> World of Warcraft **3.3.5a (WotLK)** addon · made by **feralpaw** · version **1.2.3**
 
 **Fast jump:** [Features](#features) | [Install](#install) | [Moving icons](#moving-icons) | [Glow](#glow) | [Group frame](#group-frame) | [Profiles](#profiles) | [Mouse controls](#mouse-controls) | [Commands](#commands) | [Options](#options) | [Changelog](#changelog)
 
@@ -185,6 +185,9 @@ Esc → Interface → AddOns → **TrinketBuddy** (or `/tb`):
 ---
 
 ## Changelog
+
+### 1.2.3 (2026-11-07)
+- Boss-kill reset now waits until the whole encounter is over (combat ends and no boss of the fight is alive), so multi-boss fights like the Four Horsemen reset only once, and wipes don't reset
 
 ### 1.2.2 (2026-11-07)
 - Boss kill now resets all cooldowns: trinkets, rings and enchants (option "Boss kill resets all cooldowns")
